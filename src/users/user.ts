@@ -50,24 +50,22 @@ export async function user(userId: number) {
   _user.post("/sendMessage", async (req, res) => {
     const { message, destinationUserId }: { message: string; destinationUserId: number } = req.body;
 
-    // Fetch the node registry to get information about registered nodes
+    
     try {
       const response = await axios.get(`http://localhost:${REGISTRY_PORT}/getNodeRegistry`);
       const nodes: Node[] = response.data.nodes;
 
-      // Pick 3 random distinct nodes from the registry
+      
       const selectedNodes: Node[] = getRandomDistinctNodes(nodes, 3);
-
-      // Encrypt the message with layers of encryption and forward to entry node
       const encryptedMessage = await encryptAndForwardMessage(message, destinationUserId, selectedNodes);
 
       selectedNodes.reverse()
 
-      // Forward the encrypted message to the entry node
+      
       await axios.post(`http://localhost:${BASE_ONION_ROUTER_PORT + selectedNodes[0].nodeId}/message`, { message: encryptedMessage });
 
-      lastSentMessage = message; // Update last sent message
-      lastCircuit = selectedNodes; // Update last circuit
+      lastSentMessage = message; 
+      lastCircuit = selectedNodes; 
 
       res.status(200).json({ message: "Message sent successfully" });
     } catch (error) {

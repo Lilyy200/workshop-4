@@ -34,7 +34,7 @@ export async function launchRegistry() {
     const { nodeId, pubKey }: RegisterNodeBody = req.body;
 
     if (nodeId !== undefined && nodeId !== null && pubKey) {
-      //private key
+      
       const newNode: Node = { nodeId, pubKey };
       registeredNodes.nodes.push(newNode);
 
@@ -44,7 +44,7 @@ export async function launchRegistry() {
     }
   });
 
-  //node registry route
+  //node registry  route
   _registry.get("/getNodeRegistry", (req, res) => {
     res.json(registeredNodes);
   });
