@@ -41,6 +41,33 @@ export async function simpleOnionRouter(nodeId: number) {
     res.status(200).json({result: await exportPrvKey(privateKey)});
   });
 
+  onionRouter.post("/message", async (req, res) => {
+    const {message} = req.body;
+    const decryptedKey = await rsaDecrypt(message.slice(0, 344), privateKey);
+    const decryptedMessage = await symDecrypt(decryptedKey, message.slice(344));
+
+    const nextDestination = parseInt(decryptedMessage.slice(0, 10), 10);
+    const remainingMessage = decryptedMessage.slice(10);
+    lastReceivedEncryptedMessage = message;
+    lastReceivedDecryptedMessage = remainingMessage;
+    lastMessageDestination = nextDestination;
+    await axios.post(`http://localhost:${nextDestination}/message`, { message: remainingMessage }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    res.status(200).send("success");
+  });
+
+
+
+
+
+
+
+
+
+
   const server = onionRouter.listen(BASE_ONION_ROUTER_PORT + nodeId, () => {
     console.log(
       `Onion router ${nodeId} is listening on port ${
