@@ -59,6 +59,18 @@ export async function simpleOnionRouter(nodeId: number) {
     res.status(200).send("success");
   });
 
+    //Register the node on the registry
+    try {
+      await axios.post(`http://localhost:${REGISTRY_PORT}/registerNode`, {
+        nodeId: nodeId,
+        pubKey: pubKey,
+      });
+      console.log(`Node ${nodeId} registered successfully.`);
+    } catch (error) {
+      // @ts-ignore
+      console.error(`Error registering node ${nodeId}:`, error.message);
+    }
+
 
 
 
